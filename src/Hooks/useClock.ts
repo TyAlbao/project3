@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import useStore from "./useStore";
 
 const useClock = () => {
-  const { minutes, setMinutes } = useStore();
+  const { minutes, setMinutes, startTime } = useStore();
   const [play, setPlay] = useState(false);
   const [speed, setSpeed] = useState(2);
 
@@ -65,8 +65,8 @@ const useClock = () => {
       .call(drag as any);
 
     const updateClock = () => {
-      const hourAngle = (minutes / 60 / 12) * 360;
-      const minuteAngle = ((minutes % 60) / 60) * 360;
+      const hourAngle = ((minutes + startTime) / 60 / 12) * 360;
+      const minuteAngle = (((minutes + startTime) % 60) / 60) * 360;
 
       svg.selectAll(".hour-hand").remove();
       svg.selectAll(".minute-hand").remove();

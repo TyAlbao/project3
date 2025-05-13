@@ -15,15 +15,22 @@ const Mouse = ({ speed, gender }: MouseProps) => {
   const angleRef = useRef(0);
   const speedRef = useRef({ x: 0, y: 0 });
   const imgRef = useRef<HTMLImageElement>(null);
-  speed = speed < 20 ? 0 : speed;
+
+  const sleepThreshold = 12;
+
+  useEffect(() => {
+    speed = speed < sleepThreshold ? 0 : speed;
+    speedRef.current = {
+      x: Math.cos(angleRef.current) * speed,
+      y: Math.sin(angleRef.current) * speed,
+    };
+  }, [speed]);
 
   useEffect(() => {
     const angle = Math.random() * 2 * Math.PI;
     speedRef.current = { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed };
     angleRef.current = angle;
-  }, []);
 
-  useEffect(() => {
     const interval = setInterval(() => {
       setPos((prev) => {
         const newX = prev.x + speedRef.current.x;
@@ -71,7 +78,7 @@ const Mouse = ({ speed, gender }: MouseProps) => {
     <img
       ref={imgRef}
       src={
-        speed > 20
+        speed > sleepThreshold
           ? gender === "male"
             ? runningMale
             : runningFemale
