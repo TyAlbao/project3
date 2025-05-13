@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as d3 from "d3";
 import "../index.css";
 import useStore from "../Hooks/useStore"
+import { useDayNight } from "../Hooks/useDayNight";
 
 interface MouseSeries {
   id: string;
@@ -9,10 +10,11 @@ interface MouseSeries {
   values: number[];
 }
 
+
 function MouseDashboard() {
   const [series, setSeries] = useState<MouseSeries[]>([]);
-  // const [frame, setFrame] = useState(0);
   const { minutes } = useStore();
+  const { isNight } = useDayNight();
 
   useEffect(() => {
     d3.csv("../../Checkpoint/mouse_data.csv").then((rows) => {
@@ -29,18 +31,6 @@ function MouseDashboard() {
     });
   }, []);
 
-  // // sets up the animation
-  // useEffect(() => {
-  //   if (series.length === 0) {
-  //     return;
-  //   }
-  //   const id = setInterval(() => {
-  //     setFrame((f) => (f + 1) % series[0].values.length);
-  //   }, 100);
-
-  //   return () => clearInterval(id);
-  // }, [series]);
-
   const females = series.filter((s) => s.sex === "f");
   const males = series.filter((s) => s.sex === "m");
 
@@ -51,7 +41,7 @@ function MouseDashboard() {
     .nice();
 
   const plot = (subset: MouseSeries[], width: number, height: number) => {
-    const mouse = { top: 20, right: 20, bottom: 30, left: 40 };
+    const mouse = { top: 60, right: 50, bottom: 40, left: 50 };
     const innerHeight = height - mouse.top - mouse.bottom;
 
     const xScale = d3
@@ -62,21 +52,70 @@ function MouseDashboard() {
 
     yScale.range([innerHeight + mouse.top, mouse.top]);
 
+    const textColor = isNight ? "#FFFFFF" : "#000000";
+
     return (
-      <svg width={width} height={height} className="mouse-chart" key={subset[0]?.sex}>
-        {/* axes */}
+      <svg width={width} height={height} className="mouse-chart mt-6" key={subset[0]?.sex}>
         <g
-          ref={(g) => g && d3.select(g).call(d3.axisLeft(yScale).ticks(5))}
+          ref={(g) => {
+            if (g) {
+              d3.select(g).call(d3.axisLeft(yScale).ticks(5));
+            }
+          }}
           transform={`translate(${mouse.left},0)`}
         />
         <g
-          ref={(g) => g && d3.select(g).call(d3.axisBottom(xScale).tickSizeOuter(0))}
+          ref={(g)=> {
+            if (g) {
+              d3.select(g).call(d3.axisBottom(xScale).tickSizeOuter(0));
+            }
+          }}
           transform={`translate(0,${innerHeight + mouse.top})`}
         />
 
-        {/* bars */}
+        <text
+          x={width / 2}
+          y={mouse.top / 2}
+          textAnchor="middle"
+          className="text-lg font-bold"
+          style={{
+            transition: "color 0.5s",
+            fill: textColor,
+          }}
+        >
+          {subset[0]?.sex === "f" ? "Female Mouse Activity" : "Male Mouse Activity"}
+        </text>
+
+        <text
+          transform={`rotate(-90)`}
+          x={- (height / 2)}
+          y={mouse.left -35}
+          textAnchor="middle"
+          className="text-md font-regular"
+          style={{
+            transition: "color 0.5s",
+            fill: textColor,
+          }}
+        >
+          Activity Level
+        </text>
+
+        <text
+          x={width / 2}
+          y={height - 6}
+          textAnchor="middle"
+          className="text-md font-regular"    
+          style={{
+            transition: "color 0.5s",
+            fill: textColor,
+          }}   
+        >
+          Mouse ID
+        </text>
+
         {subset.map((s) => {
-          const values = s.values[minutes % s.values.length];
+          const idx = Math.floor(minutes) % s.values.length;
+          const values = s.values[idx];
           const x = xScale(s.id)!;
           const y = yScale(values);
           const barHeight = yScale(0) - y;
