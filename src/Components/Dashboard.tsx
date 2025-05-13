@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as d3 from "d3";
 import "../index.css";
 import useStore from "../Hooks/useStore"
+import { useDayNight } from "../Hooks/useDayNight";
 
 interface MouseSeries {
   id: string;
@@ -9,13 +10,11 @@ interface MouseSeries {
   values: number[];
 }
 
-interface DashboardProps {
-  isNight: boolean;
-}
 
-function MouseDashboard({ isNight }: DashboardProps) {
+function MouseDashboard() {
   const [series, setSeries] = useState<MouseSeries[]>([]);
   const { minutes } = useStore();
+  const { isNight } = useDayNight();
 
   useEffect(() => {
     d3.csv("../../Checkpoint/mouse_data.csv").then((rows) => {
@@ -58,11 +57,20 @@ function MouseDashboard({ isNight }: DashboardProps) {
     return (
       <svg width={width} height={height} className="mouse-chart mt-6" key={subset[0]?.sex}>
         <g
-          ref={(g) => g && d3.select(g).call(d3.axisLeft(yScale).ticks(5))}
+          ref={(g) => {
+            if (g) {
+              // tell d3 to draw the axis **but don’t return the Selection**
+              d3.select(g).call(d3.axisLeft(yScale).ticks(5));
+            }
+          }}
           transform={`translate(${mouse.left},0)`}
         />
         <g
-          ref={(g) => g && d3.select(g).call(d3.axisBottom(xScale).tickSizeOuter(0))}
+          ref={(g)=> {
+            if (g) {
+              d3.select(g).call(d3.axisBottom(xScale).tickSizeOuter(0));
+            }
+          }}
           transform={`translate(0,${innerHeight + mouse.top})`}
         />
 
@@ -71,7 +79,10 @@ function MouseDashboard({ isNight }: DashboardProps) {
           y={mouse.top / 2}
           textAnchor="middle"
           className="text-lg font-bold"
-          fill={textColor}
+          style={{
+            transition: "color 0.5s",
+            fill: textColor,
+          }}
         >
           {subset[0]?.sex === "f" ? "Female Mouse Activity" : "Male Mouse Activity"}
         </text>
@@ -82,7 +93,10 @@ function MouseDashboard({ isNight }: DashboardProps) {
           y={mouse.left -35}
           textAnchor="middle"
           className="text-md font-regular"
-          fill={textColor}
+          style={{
+            transition: "color 0.5s",
+            fill: textColor,
+          }}
         >
           Activity Level
         </text>
@@ -92,7 +106,10 @@ function MouseDashboard({ isNight }: DashboardProps) {
           y={height - 6}
           textAnchor="middle"
           className="text-md font-regular"    
-          fill={textColor}    
+          style={{
+            transition: "color 0.5s",
+            fill: textColor,
+          }}   
         >
           Mouse ID
         </text>
