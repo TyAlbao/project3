@@ -59,7 +59,6 @@ function MouseDashboard() {
         <g
           ref={(g) => {
             if (g) {
-              // tell d3 to draw the axis **but don’t return the Selection**
               d3.select(g).call(d3.axisLeft(yScale).ticks(5));
             }
           }}
