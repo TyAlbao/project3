@@ -21,6 +21,7 @@ const App = () => {
   const { minutes } = useTime();
 
   const minutesString = String((Math.floor(minutes) + 1440) % 1440) as keyof typeof mouseData;
+  console.log(minutesString);
   const maleTemp = mouseData[minutesString]["male"]["temperature"];
   const femaleTemp = mouseData[minutesString]["female"]["temperature"];
   const maleActivity = mouseData[minutesString]["male"]["activity"];

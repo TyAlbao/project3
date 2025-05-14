@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import * as d3 from "d3";
-import "../index.css";
 import useTime from "../Hooks/useTime";
 import { useDayNight } from "../Hooks/useDayNight";
 
@@ -16,7 +15,7 @@ function MouseDashboard() {
   const { isNight } = useDayNight();
 
   useEffect(() => {
-    d3.csv("../../Checkpoint/mouse_data.csv").then((rows) => {
+    d3.csv("/project3/mouse_data.csv").then((rows) => {
       const activityCols = rows.columns!.filter((col) => col.endsWith("_act"));
 
       const parsed: MouseSeries[] = activityCols.map((col) => {
