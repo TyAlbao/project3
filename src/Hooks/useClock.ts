@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import useStore from "./useStore";
+import useTime from "./useTime";
 
 const useClock = () => {
-  const { minutes, setMinutes, startTime } = useStore();
+  const { minutes, setMinutes, startTime } = useTime();
   const [play, setPlay] = useState(false);
   const [speed, setSpeed] = useState(2);
 
@@ -23,16 +23,41 @@ const useClock = () => {
   }, [play, speed, minutes]);
 
   useEffect(() => {
-    const radius = 150;
+    const radius = 130;
     const svg = d3
       .select(svgRef.current)
       .attr("width", radius * 2)
       .attr("height", radius * 2)
-      .attr("viewBox", `0 0 ${radius * 2} ${radius * 2}`)
+      .attr("viewBox", `0 0 ${radius * 2 + 10} ${radius * 2 + 10}`)
       .append("g")
-      .attr("transform", `translate(${radius}, ${radius})`);
+      .attr("transform", `translate(${radius + 5}, ${radius + 5})`);
 
     svg.append("circle").attr("r", radius).attr("fill", "#f0f0f0").attr("stroke", "#333");
+
+    const arc = d3.arc<d3.DefaultArcObject>()
+      .innerRadius(radius + 20)
+      .outerRadius(radius + 10)
+      .startAngle(Math.PI / 6)
+      .endAngle(Math.PI / 3);
+
+    svg.append("path")
+      .attr("d", arc({
+        innerRadius: radius + 20,
+        outerRadius: radius + 10,
+        startAngle: Math.PI / 6,
+        endAngle: Math.PI / 3
+      }))
+      .attr("fill", "#666")
+      .attr("cursor", "pointer");
+    
+    const symbol = d3.symbol()
+      .type(d3.symbolTriangle)
+      .size(200);
+
+    svg.append("path")
+      .attr("d", symbol)
+      .attr("fill", "#666")
+      .attr("transform", `translate(${(radius + 15) * Math.sqrt(3) / 2}, ${-(radius + 15) * 1 / 2}) rotate(30)`);
 
     const calculateAngle = ({ x, y }: { x: number; y: number }) => Math.atan2(y, x);
 
@@ -43,10 +68,7 @@ const useClock = () => {
         initialMinutesRef.current = minutes;
       })
       .on("drag", (event) => {
-        const newAngle = calculateAngle({
-          x: event.x - radius * Number(draggingRef.current),
-          y: event.y - radius * Number(draggingRef.current),
-        });
+        const newAngle = calculateAngle(event);
         const adjustedAngle = newAngle - initialAngleRef.current;
         const newMinutes = Math.floor((adjustedAngle / (2 * Math.PI)) * 1440 * speed);
         draggingRef.current = true;
@@ -59,7 +81,7 @@ const useClock = () => {
 
     svg
       .append("circle")
-      .attr("r", radius - 10)
+      .attr("r", radius)
       .attr("fill", "transparent")
       .attr("cursor", "pointer")
       .call(drag as any);

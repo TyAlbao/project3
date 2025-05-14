@@ -6,16 +6,16 @@ import {
   BsSkipForwardFill,
   BsSkipStartFill,
 } from "react-icons/bs";
-import useStore from "../Hooks/useStore";
+import useTime from "../Hooks/useTime";
 
 const Clock = () => {
   const { svgRef, play, setPlay, setSpeed } = useClock();
-  const { minutes, setMinutes, startTime } = useStore();
+  const { minutes, setMinutes, startTime } = useTime();
 
   return (
     <div className="flex flex-col items-center gap-4">
       <h1 className="text-2xl font-bold">
-        <span>{String(Math.floor((minutes + startTime) / 60) % 12 || 12).padStart(2, "0")}</span> :{" "}
+        <span>{String(Math.floor((minutes + startTime) / 60 + 12) % 12 || 12).padStart(2, "0")}</span> :{" "}
         <span>{String(Math.floor((minutes + startTime) % 60)).padStart(2, "0")}</span>{" "}
         <span>{(minutes + startTime) % 1440 > 720 ? "PM" : "AM"}</span>
       </h1>

@@ -8,9 +8,10 @@ import sleepingFemale from "../Assets/SleepingFemale.gif";
 type MouseProps = {
   speed: number;
   gender: "male" | "female";
+  initialPos?: { x: number; y: number };
 };
 
-const Mouse = ({ speed, gender }: MouseProps) => {
+const Mouse = ({ speed, gender, initialPos }: MouseProps) => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const angleRef = useRef(0);
   const speedRef = useRef({ x: 0, y: 0 });
@@ -30,6 +31,7 @@ const Mouse = ({ speed, gender }: MouseProps) => {
     const angle = Math.random() * 2 * Math.PI;
     speedRef.current = { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed };
     angleRef.current = angle;
+    if (initialPos) setPos(initialPos);
 
     const interval = setInterval(() => {
       setPos((prev) => {

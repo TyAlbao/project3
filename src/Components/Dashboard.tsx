@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as d3 from "d3";
 import "../index.css";
-import useStore from "../Hooks/useStore"
+import useTime from "../Hooks/useTime";
 import { useDayNight } from "../Hooks/useDayNight";
 
 interface MouseSeries {
@@ -10,10 +10,9 @@ interface MouseSeries {
   values: number[];
 }
 
-
 function MouseDashboard() {
   const [series, setSeries] = useState<MouseSeries[]>([]);
-  const { minutes } = useStore();
+  const { minutes } = useTime();
   const { isNight } = useDayNight();
 
   useEffect(() => {
@@ -22,7 +21,7 @@ function MouseDashboard() {
 
       const parsed: MouseSeries[] = activityCols.map((col) => {
         const id = col.replace("_act", "");
-        const sex  = id.startsWith("f") ? "f" : "m";
+        const sex = id.startsWith("f") ? "f" : "m";
         const values = rows.map((row) => +row[col]);
         return { id, sex, values };
       });
@@ -65,7 +64,7 @@ function MouseDashboard() {
           transform={`translate(${mouse.left},0)`}
         />
         <g
-          ref={(g)=> {
+          ref={(g) => {
             if (g) {
               d3.select(g).call(d3.axisBottom(xScale).tickSizeOuter(0));
             }
@@ -88,8 +87,8 @@ function MouseDashboard() {
 
         <text
           transform={`rotate(-90)`}
-          x={- (height / 2)}
-          y={mouse.left -35}
+          x={-(height / 2)}
+          y={mouse.left - 35}
           textAnchor="middle"
           className="text-md font-regular"
           style={{
@@ -102,13 +101,13 @@ function MouseDashboard() {
 
         <text
           x={width / 2}
-          y={height - 6}
+          y={height}
           textAnchor="middle"
-          className="text-md font-regular"    
+          className="text-md font-regular"
           style={{
             transition: "color 0.5s",
             fill: textColor,
-          }}   
+          }}
         >
           Mouse ID
         </text>
@@ -119,7 +118,7 @@ function MouseDashboard() {
           const x = xScale(s.id)!;
           const y = yScale(values);
           const barHeight = yScale(0) - y;
-          const color  = s.sex === "f" ? "#e56997" : "#4f83c4";
+          const color = s.sex === "f" ? "#e56997" : "#4f83c4";
 
           return (
             <rect
@@ -136,9 +135,8 @@ function MouseDashboard() {
     );
   };
 
-
-  const height = 350;
-  const width  = 350;
+  const height = 300;
+  const width = 350;
 
   return (
     <div className="flex justify-center items-center">

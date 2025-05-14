@@ -3,9 +3,11 @@ import Clock from "./Components/Clock";
 import Mouse from "./Components/Mouse";
 import Dashboard from "./Components/Dashboard";
 import mouseData from "./Assets/mouse_data.json";
-import useStore from "./Hooks/useStore";
+import useTime from "./Hooks/useTime";
 import { useDayNight } from "./Hooks/useDayNight";
-{/*import { useState, useEffect } from "react";*/}
+{
+  /*import { useState, useEffect } from "react";*/
+}
 import {
   BsSkipBackwardFill,
   BsSkipEndFill,
@@ -16,108 +18,78 @@ import { FaPause, FaPlay } from "react-icons/fa";
 
 const App = () => {
   useDayNight();
-  const { minutes } = useStore();
+  const { minutes } = useTime();
 
-  const minutesString = String(Math.floor(minutes)) as keyof typeof mouseData;
+  const minutesString = String((Math.floor(minutes) + 1440) % 1440) as keyof typeof mouseData;
   const maleTemp = mouseData[minutesString]["male"]["temperature"];
   const femaleTemp = mouseData[minutesString]["female"]["temperature"];
   const maleActivity = mouseData[minutesString]["male"]["activity"];
   const femaleActivity = mouseData[minutesString]["female"]["activity"];
 
   return (
-  <div className="flex flex-col items-center relative min-h-screen overflow-hidden">
-    <div className="absolute inset-0 z-0">
-      <Mouse speed={maleActivity} gender="male" />
-      <Mouse speed={femaleActivity} gender="female" />
-    </div>
-    <div className="relative z-10 flex flex-col items-center w-full">
-      {/* Outer wrapper to center content */}
-      <div className="flex justify-center w-full">
-        <div className="flex flex-row max-w-7xl w-full px-8 gap-x-16 mt-6">
-          {/* Left side: legend and description */}
-          <div className="w-1/3 pl-6 text-xl"> {/* Increased font size */}
-            {/* Legend */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-3">Legend</h2> {/* Increased font size */}
-              <div className="flex items-center mb-2">
-                <div className="w-4 h-4 mr-3" style={{ backgroundColor: "#e56997" }}></div>
-                <span>Female Mice</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 mr-3" style={{ backgroundColor: "#4f83c4" }}></div>
-                <span>Male Mice</span>
-              </div>
-            </div>
+    <div className="flex flex-col items-center relative min-h-screen overflow-hidden p-10">
+      <div className="absolute inset-0 z-0">
+        <Mouse speed={maleActivity / 2} gender="male" initialPos={{ x: 500, y: 100 }} />
+        <Mouse speed={femaleActivity / 2} gender="female" initialPos={{ x: -500, y: 100 }} />
+      </div>
 
-            {/* Components */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-3">Components</h2> {/* Increased font size */}
-              <p className="text-lg leading-relaxed"> {/* Increased font size */}
-                <ul className="list-disc pl-6">
-                  <li className="text-xl">
-                    Thermometers: mean temperature of males and females at current minute.
-                  </li>
-                  <li className="text-xl">
-                    Bar plots: activity level of all males and females.
-                  </li>
-                  <li className="text-xl">
-                    Mice clipart: animated mice moving at mean activity level at current minute.
-                  </li>
-                </ul>
-              </p>
-            </div>
+      <div className="flex z-10 w-full">
+        <div className="flex-2 flex flex-col items-center border-2 border-gray-400 rounded-lg p-4 h-fit gap-3">
+          <h2 className="text-lg font-semibold">Components</h2>
+          <ul className="list-disc pl-6 text-sm flex flex-col gap-2">
+            <li>
+              <strong>Thermometer:</strong> Mean temp per minute.
+            </li>
+            <li>
+              <strong>Bar Plot:</strong> Activity level per mouse.
+            </li>
+            <li>
+              <strong>Animated Mice:</strong> Mean activity over time.
+            </li>
+          </ul>
+        </div>
 
-            <div className="mb-6" />
-
-            {/* Interaction */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-3">Interaction</h2> {/* Increased font size */}
-              <p className="text-lg leading-relaxed"> {/* Increased font size */}
-                <ul>
-                  <li className="text-xl">
-                    <FaPlay className="inline-block mr-2" />
-                    <FaPause className="inline-block mr-2" />
-                    Start/stop clock.
-                  </li>
-                  <li className="text-xl">
-                    <BsSkipStartFill className="inline-block mr-2" />
-                    <BsSkipEndFill className="inline-block mr-2" />
-                    Fast-forward/backward by one hour.
-                  </li>
-                  <li className="text-xl">
-                    <BsSkipBackwardFill className="inline-block mr-2" />
-                    <BsSkipForwardFill className="inline-block mr-2" />
-                    Speed-up/slow-down the clock.
-                  </li>
-                </ul>
-              </p>
-            </div>
+        <div className="flex-[3] flex flex-col items-center flex-grow text-xl">
+          <h1 className="text-2xl font-bold">A Day in the Life of a Mouse</h1>
+          <a
+            href="https://docs.google.com/document/d/1KPqizMmoEXTw7Z4Lwt1QpBspAC_ESh7OfkJ_49fLLrY/edit?tab=t.0"
+            className="text-base mb-6 hover:underline text-blue-500"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Writeup
+          </a>
+          <div className="flex items-center justify-center gap-6 mb-4">
+            <Thermometer temp={femaleTemp} gender="female" />
+            <Clock />
+            <Thermometer temp={maleTemp} gender="male" />
           </div>
+          <Dashboard />
+        </div>
 
-          <div className="flex flex-col items-center flex-grow text-xl">
-            {/* Title at the top of the visualization */}
-            <h1 className="text-3xl font-bold mb-6">
-              Temperature and Activity of Mice Over Time
-            </h1> {/* Added title */}
-
-            <div className="flex items-center justify-center gap-6 mb-4">
-              <Thermometer temp={femaleTemp} gender="female" />
-              <Clock />
-              <Thermometer temp={maleTemp} gender="male" />
-            </div>
-            <Dashboard />
-            <div className="absolute inset-0 z-0">
-              <Mouse speed={maleActivity / 2} gender="male" />
-              <Mouse speed={femaleActivity / 2} gender="female" />
-            </div>
-          </div>
+        <div className="flex-2 flex flex-col items-center border-2 border-gray-400 rounded-lg p-4 h-fit gap-3">
+          <h2 className="text-lg font-semibold">Interaction</h2>
+          <ul className="text-sm flex flex-col gap-2">
+            <li className="flex items-center gap-2">
+              <FaPlay />
+              <FaPause />
+              <span>Start/stop clock.</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <BsSkipStartFill />
+              <BsSkipEndFill />
+              <span>Move forward/back by one hour.</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <BsSkipBackwardFill />
+              <BsSkipForwardFill />
+              <span>Speed-up/slow-down the clock.</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
-  </div>
-);
-
-  
+  );
 };
 
 export default App;

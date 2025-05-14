@@ -1,12 +1,12 @@
 import { create } from "zustand";
 
-interface Store {
+interface TimeProps {
   minutes: number;
   startTime: number;
   setMinutes: (minutes: number) => void;
 }
 
-const useStore = create<Store>((set) => ({
+const useTime = create<TimeProps>((set) => ({
   minutes: 0,
   startTime: 60 * 18,
   setMinutes: (minutes: number | ((prev: number) => number)) => {
@@ -18,4 +18,4 @@ const useStore = create<Store>((set) => ({
   },
 }));
 
-export default useStore;
+export default useTime;
