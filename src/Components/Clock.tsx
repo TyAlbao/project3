@@ -9,8 +9,8 @@ import {
 import useTime from "../Hooks/useTime";
 
 const Clock = () => {
-  const { svgRef, play, setPlay, setSpeed } = useClock();
-  const { minutes, setMinutes, startTime } = useTime();
+  const { svgRef, setSpeed } = useClock();
+  const { minutes, setMinutes, startTime, play, setPlay } = useTime();
 
   return (
     <div className="flex flex-col items-center gap-4">

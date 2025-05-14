@@ -4,6 +4,7 @@ import runningMale from "../Assets/RunningMale.gif";
 import runningFemale from "../Assets/RunningFemale.gif";
 import sleepingMale from "../Assets/SleepingMale.gif";
 import sleepingFemale from "../Assets/SleepingFemale.gif";
+import useTime from "../Hooks/useTime";
 
 type MouseProps = {
   speed: number;
@@ -12,20 +13,21 @@ type MouseProps = {
 };
 
 const Mouse = ({ speed, gender, initialPos }: MouseProps) => {
-  const [pos, setPos] = useState({ x: 0, y: 0 });
   const angleRef = useRef(0);
   const speedRef = useRef({ x: 0, y: 0 });
+  const [pos, setPos] = useState({ x: 0, y: 0 });
   const imgRef = useRef<HTMLImageElement>(null);
+  const { play } = useTime();
 
   const sleepThreshold = 12;
 
   useEffect(() => {
-    speed = speed < sleepThreshold ? 0 : speed;
+    speed = speed < sleepThreshold || !play ? 0 : speed;
     speedRef.current = {
       x: Math.cos(angleRef.current) * speed,
       y: Math.sin(angleRef.current) * speed,
     };
-  }, [speed]);
+  }, [speed, play]);
 
   useEffect(() => {
     const angle = Math.random() * 2 * Math.PI;
@@ -48,7 +50,6 @@ const Mouse = ({ speed, gender, initialPos }: MouseProps) => {
           speedRef.current.x *= -1;
           const randomIncrement = (Math.random() * 2 - 1) * 0.5;
           angleRef.current = Math.atan2(speedRef.current.y, speedRef.current.x) + randomIncrement;
-          // Update speed vector based on new angle
           speedRef.current = {
             x: Math.cos(angleRef.current) * speed,
             y: Math.sin(angleRef.current) * speed,
@@ -58,7 +59,6 @@ const Mouse = ({ speed, gender, initialPos }: MouseProps) => {
           speedRef.current.y *= -1;
           const randomIncrement = (Math.random() * 2 - 1) * 0.5;
           angleRef.current = Math.atan2(speedRef.current.y, speedRef.current.x) + randomIncrement;
-          // Update speed vector based on new angle
           speedRef.current = {
             x: Math.cos(angleRef.current) * speed,
             y: Math.sin(angleRef.current) * speed,

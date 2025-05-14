@@ -3,8 +3,7 @@ import * as d3 from "d3";
 import useTime from "./useTime";
 
 const useClock = () => {
-  const { minutes, setMinutes, startTime } = useTime();
-  const [play, setPlay] = useState(false);
+  const { minutes, setMinutes, startTime, play } = useTime();
   const [speed, setSpeed] = useState(2);
 
   const svgRef = useRef(null);
@@ -20,7 +19,7 @@ const useClock = () => {
     }, 1000 / 60);
 
     return () => clearInterval(interval);
-  }, [play, speed, minutes]);
+  }, [play, speed, minutes, setMinutes]);
 
   useEffect(() => {
     const radius = 130;
@@ -84,7 +83,7 @@ const useClock = () => {
       .attr("r", radius)
       .attr("fill", "transparent")
       .attr("cursor", "pointer")
-      .call(drag as any);
+      .call(drag as unknown as d3.DragBehavior<SVGCircleElement, unknown, unknown>);
 
     const updateClock = () => {
       const hourAngle = ((minutes + startTime) / 60 / 12) * 360;
@@ -118,12 +117,13 @@ const useClock = () => {
 
     updateClock();
 
+    const svgElement = svgRef.current;
     return () => {
-      d3.select(svgRef.current).selectAll("*").remove();
+      d3.select(svgElement).selectAll("*").remove();
     };
-  }, [minutes]);
+  }, [minutes, setMinutes, speed, startTime]);
 
-  return { svgRef, play, setPlay, speed, setSpeed };
+  return { svgRef, speed, setSpeed };
 };
 
 export default useClock;
